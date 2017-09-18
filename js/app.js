@@ -1,3 +1,4 @@
+"use strict";
 // 这是我们的玩家要躲避的敌人 
 var Enemy = function(x,y,speed) {
     // 要应用到每个敌人的实例的变量写在这里
@@ -27,8 +28,8 @@ Enemy.prototype.render = function() {
 };
 //敌人和玩家遭遇，游戏重新开始
 Enemy.prototype.checkCollisions = function(){
-     if(player.x>this.x-30&&player.x<this.x+30)
-        if(player.y>this.y-30&&player.y<this.y+30){
+     if(player.x>this.x-50&&player.x<this.x+30)
+        if(player.y>this.y-50&&player.y<this.y+30){
           game.replay();
         }
 };
@@ -88,25 +89,37 @@ Player.prototype.handleInput = function(direction){
         }
     }   
 };
-// 现在实例化你的所有对象
-var enemy_bug1 = new Enemy(0,60,50);
-var enemy_bug2 = new Enemy(-150,145,45);
-var enemy_bug3 = new Enemy(-400,230,40);
-var enemy_bug4 = new Enemy(-360,60,50);
-var enemy_bug5 = new Enemy(-450,145,45);
-var enemy_bug6 = new Enemy(-580,230,40);   
 
-// 把所有敌人的对象都放进一个叫 allEnemies 的数组里面
-var allEnemies = [];
-allEnemies.push(enemy_bug1);
-allEnemies.push(enemy_bug2);
-allEnemies.push(enemy_bug3);
-allEnemies.push(enemy_bug4);
-allEnemies.push(enemy_bug5);
-allEnemies.push(enemy_bug6);
+// 游戏设置
+var Game = function(){
+    //游戏重新开始按钮
+    this.btnplayX = 410;
+    this.btnplayY = 400;
+    this.btnStart = 'images/Key.png';
+};
 
-// 把玩家对象放进一个叫 player 的变量里面
-var player = new Player(200,400);
+//显示重新开始游戏按钮
+Game.prototype.showBtnStart = function(){
+    ctx.drawImage(Resources.get(this.btnStart),this.btnplayX,this.btnplayY);
+};
+//游戏开始，玩家位置、敌人位置和速度
+Game.prototype.replay = function(){
+   allEnemies = [];
+   this.addEnemyBugs();
+   this.resetPlayer();
+};
+
+//添加玩家的敌人
+Game.prototype.addEnemyBugs = function(){    
+   for(var i=0;i<10;i++){
+        var random  = parseInt(10*Math.random()%3);
+        var x = random*(-150);
+        var y = random*85+60;
+        var speed = 70-10*random;
+        var enemy_bug= new Enemy(x,y,speed); 
+        allEnemies.push(enemy_bug);
+    }
+};
 
 // 这段代码监听游戏玩家的键盘点击事件并且代表将按键的关键数字送到 Play.handleInput()
 // 方法里面。你不需要再更改这段代码了。
@@ -121,48 +134,20 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
-//游戏重新开始按钮
-var Game = function(){
-    this.btnplayX = 410;
-    this.btnplayY = 400;
-    this.btnStart = 'images/Key.png';
-};
-//显示重新开始游戏按钮
-Game.prototype.showBtnStart = function(){
-    ctx.drawImage(Resources.get(this.btnStart),this.btnplayX,this.btnplayY);
-};
-//游戏开始，玩家位置、敌人位置和速度
-Game.prototype.replay = function(){
+//重置玩家状态
+Game.prototype.resetPlayer = function(){
    player.x=200;
    player.y=400;
    player.won=false;
-   var k=0,x=0,y=0,speed=0;
-   allEnemies.forEach(function(enemy){
-    k++;
-    switch(k){
-        case 1:
-            x=0;y=60;speed=50;
-            break;
-        case 2:
-            x=-150;y=145;speed=45;
-            break;
-        case 3:
-            x=-400;y=230;speed=40;
-            break;
-        case 4:
-            x=-360;y=60;speed=50;
-            break;
-        case 5:
-            x=-450;y=145;speed=45;
-            break;
-        case 6:
-            x=-580;y=230;speed=40;
-            break;
-    }
-    enemy.y = y;
-    enemy.x = x;
-    enemy.speed = speed;
-   });
 };
 
+//
 var game = new Game();
+// 现在实例化你的所有对象
+// 把所有敌人的对象都放进一个叫 allEnemies 的数组里面
+var allEnemies = [];
+game.addEnemyBugs();
+
+// 把玩家对象放进一个叫 player 的变量里面
+var player = new Player(200,400);
+
